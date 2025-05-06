@@ -4,7 +4,7 @@ export const clinician: Clinician = {
   id: "9c516382-c5b2-4677-a7ac-4e100fa35bdd",
   firstName: "Jane",
   lastName: "Doe",
-  states: ["NY", "CA"],
+  states: ["NY", "FL"],
   insurances: ["AETNA", "CIGNA"],
   clinicianType: "PSYCHOLOGIST",
   appointments: [],

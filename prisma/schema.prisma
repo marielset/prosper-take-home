@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AvailableSlot {
+  id          String    @id @default(uuid())
+  clinicianId String
+  clinician   Clinician @relation(fields: [clinicianId], references: [id])
+  date        DateTime
+  length      Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+}
+
+model Appointment {
+  id              String            @id @default(uuid())
+  patientId       String
+  patient         Patient           @relation(fields: [patientId], references: [id])
+  clinicianId     String
+  clinician       Clinician         @relation(fields: [clinicianId], references: [id])
+  scheduledFor    DateTime
+  appointmentType AppointmentType
+  status          AppointmentStatus
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now()) @updatedAt
+}
+
+enum AppointmentType {
+  ASSESSMENT_SESSION_1
+  ASSESSMENT_SESSION_2
+  THERAPY_INTAKE
+  THERAPY_SIXTY_MINS
+}
+
+enum AppointmentStatus {
+  UPCOMING
+  OCCURRED
+  NO_SHOW
+  RE_SCHEDULED
+  CANCELLED
+  LATE_CANCELLATION
+}
+
+model Patient {
+  id          String         @id @default(uuid())
+  firstName   String
+  lastName    String
+  state       UsState
+  insurance   InsurancePayer
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @default(now()) @updatedAt
+  Appointment Appointment[]
+}
+
+model Clinician {
+  id                    String           @id @default(uuid())
+  firstName             String
+  lastName              String
+  states                UsState[]
+  insurances            InsurancePayer[]
+  clinicianType         ClinicianType
+  appointments          Appointment[]
+  availableSlots        AvailableSlot[]
+  maxDailyAppointments  Int
+  maxWeeklyAppointments Int
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @default(now()) @updatedAt
+}
+
+enum ClinicianType {
+  THERAPIST
+  PSYCHOLOGIST
+}
+
+enum UsState {
+  NY
+  NC
+  FL
+  // etc
+}
+
+enum InsurancePayer {
+  AETNA
+  BCBS
+  CIGNA
+  UNITED
+}
