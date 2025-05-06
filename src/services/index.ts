@@ -1,6 +1,5 @@
 import readline from "readline";
 import { findAppointmentsForPatient, findPatient } from "./findAppointments";
-import { AvailableAppointmentSlot } from "../starter-code/appointment";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -23,8 +22,7 @@ function findAppointments() {
       if (!patient) {
         console.log("Invalid patient ID, try again.");
       } else {
-        const slots: AvailableAppointmentSlot[] =
-          await findAppointmentsForPatient(patient);
+        const slots = await findAppointmentsForPatient(patient);
         console.log(slots.slice(0, 5));
       }
 
