@@ -26,14 +26,14 @@ async function findAppointmentsForPatient(patient: Patient) {
 }
 
 function mergeSlots(slots: AvailableAppointmentSlot[]) {
-  const assessmentPairs = slots.reduce(
+  const filteredSlots = filterUnusableDates(slots, 90);
+  const assessmentPairs = filteredSlots.reduce(
     (pairAcc, slotA, i, arr) => {
       for (let j = i + 1; j < arr.length; j++) {
         const slotB = arr[j];
-        const differenceInDays =
-          new Date(slotB.date).getDate() - new Date(slotA.date).getDate();
+        const differenceInDays = slotB.date.getDate() - slotA.date.getDate();
 
-        if (differenceInDays > 1 && differenceInDays <= 7) {
+        if (differenceInDays >= 1 && differenceInDays <= 7) {
           pairAcc.push({ appointmentA: slotA.date, appointmentB: slotB.date });
         }
       }
@@ -42,6 +42,25 @@ function mergeSlots(slots: AvailableAppointmentSlot[]) {
     [] as { appointmentA: Date; appointmentB: Date }[]
   );
   return assessmentPairs;
+}
+
+function filterUnusableDates(
+  slots: AvailableAppointmentSlot[],
+  duration: number
+) {
+  if (slots.length === 0) return slots;
+  let current_comparison = slots[0];
+  const newDateList = [current_comparison];
+  slots.forEach((slot) => {
+    if (
+      slot.date.getTime() - current_comparison.date.getTime() >=
+      duration * 60000
+    ) {
+      newDateList.push(slot);
+      current_comparison = slot;
+    }
+  });
+  return newDateList;
 }
 
 async function findPatient(id: string) {
