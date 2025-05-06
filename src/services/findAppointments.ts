@@ -1,25 +1,30 @@
-import readline from "readline";
+import { ClinicianTypes } from "../starter-code/clinician";
+import { Patient } from "../starter-code/patient";
+import { PrismaClient } from "@prisma/client";
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+const prisma = new PrismaClient();
 
-function findAppointments() {
-  console.log(`\n--- Welcome to your appointment finder ---`);
-  rl.question(
-    `Enter a patient ID to fetch available slots, or type 'exit' to exit: \n`,
-    async (answer) => {
-      const id = answer.trim();
-      if (id === "exit") {
-        console.log("👋 Exiting...");
-        rl.close();
-        return;
-      }
-
-      findAppointments();
-    }
-  );
+async function findAppointmentsForPatient(patient: Patient) {
+  const slots = await prisma.availableSlot.findMany({
+    where: {
+      clinician: {
+        clinicianType: ClinicianTypes[1],
+        // states: { has: patient.state },
+        insurances: { has: patient.insurance },
+      },
+    },
+    include: {
+      clinician: true,
+    },
+  });
+  return slots;
 }
 
-findAppointments();
+async function findPatient(id: string) {
+  const patient = await prisma.patient.findUnique({
+    where: { id: id },
+  });
+  return patient;
+}
+
+export { findAppointmentsForPatient, findPatient };
