@@ -1,3 +1,4 @@
+import { MOCK_APPOINTMENT_DATA } from "./mock-appointment-data";
 import { MOCK_SLOT_DATA } from "./mock-slot-data";
 
 export const clinician = {
@@ -7,7 +8,7 @@ export const clinician = {
   states: ["NY", "FL"],
   insurances: ["AETNA", "CIGNA"],
   clinicianType: "PSYCHOLOGIST",
-  appointments: undefined,
+  appointments: MOCK_APPOINTMENT_DATA,
   availableSlots: MOCK_SLOT_DATA,
   maxDailyAppointments: 2,
   maxWeeklyAppointments: 8,

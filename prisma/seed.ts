@@ -1,4 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import {
+  AppointmentStatus,
+  AppointmentType,
+  PrismaClient,
+} from "@prisma/client";
 import { patient, clinician } from "../data/starter-data";
 import { ClinicianType, InsurancePayer, UsState } from "@prisma/client/wasm";
 
@@ -27,6 +31,17 @@ async function main() {
       clinicianType: clinician.clinicianType as keyof typeof ClinicianType,
       availableSlots: {
         create: clinician.availableSlots,
+      },
+      appointments: {
+        create: clinician.appointments.map((appointment) => ({
+          scheduledFor: appointment.scheduledFor,
+          appointmentType:
+            appointment.appointmentType as keyof typeof AppointmentType,
+          status: appointment.status as keyof typeof AppointmentStatus,
+          patient: {
+            connect: { id: appointment.patientId },
+          },
+        })),
       },
     },
   });
