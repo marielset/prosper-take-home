@@ -1,4 +1,7 @@
-import { AvailableAppointmentSlot } from "../starter-code/appointment";
+import {
+  AppointmentStatuses,
+  AvailableAppointmentSlot,
+} from "../starter-code/appointment";
 import { Clinician, ClinicianTypes } from "../starter-code/clinician";
 import { Patient } from "../starter-code/patient";
 import { PrismaClient } from "@prisma/client";
@@ -9,11 +12,11 @@ async function findAppointmentsForPatient(patient: Patient) {
   const clinicians = await prisma.clinician.findMany({
     where: {
       clinicianType: ClinicianTypes[1],
-      // states: { has: patient.state }, // add this back when you've filled in states
+      states: { has: patient.state },
       insurances: { has: patient.insurance },
     },
     include: {
-      availableSlots: { take: 15, orderBy: { date: "asc" } }, // remove take 6 when done
+      availableSlots: { orderBy: { date: "asc" } },
       appointments: true,
     },
   });
@@ -121,6 +124,7 @@ async function checkWeeklyAppointments(
   return await prisma.appointment.count({
     where: {
       clinicianId: clinicianId,
+      status: { equals: AppointmentStatuses[0] },
       scheduledFor: { gte: startOfTheWeek, lt: endOfTheWeek },
     },
   });
@@ -142,6 +146,7 @@ async function checkDailyAppointments(
   return await prisma.appointment.count({
     where: {
       clinicianId: clinicianId,
+      status: { equals: AppointmentStatuses[0] },
       scheduledFor: { gte: startOfTheDay, lt: endOfTheDay },
     },
   });
