@@ -20,13 +20,16 @@ async function findAppointmentsForPatient(patient: Patient) {
   const assessmentPairsByClinician = clinicians.map((c: Clinician) => ({
     firstName: c.firstName,
     lastName: c.lastName,
-    slots: mergeSlots(c.availableSlots),
+    slots: mergeSlots(c.availableSlots, c),
   }));
   return assessmentPairsByClinician;
 }
 
-function mergeSlots(slots: AvailableAppointmentSlot[]) {
-  const filteredSlots = filterUnusableDates(slots, 90);
+function mergeSlots(slots: AvailableAppointmentSlot[], clinician: Clinician) {
+  const filteredSlots = filterUnusableDates(
+    slots,
+    clinician.clinicianType === ClinicianTypes[0] ? 60 : 90
+  );
   const assessmentPairs = filteredSlots.reduce(
     (pairAcc, slotA, i, arr) => {
       for (let j = i + 1; j < arr.length; j++) {
